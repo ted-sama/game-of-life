@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "*.page-template": "vue",
+        "*.layout-template": "vue",
+        "*.vue": "vue",
+        "*.twig": "twig",
+        "game_of_life.h": "c"
+    }
+}
