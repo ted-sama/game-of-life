@@ -18,7 +18,7 @@ typedef struct Board{
     int cols;
     Cell **cells;
     int generation;
-    struct Board *prev;  // Add pointer to previous state
+    struct Board *prev;  // Pointeur vers la génération précédente pour le undo
 } Board;
 
 Board *create_board(int rows, int cols);

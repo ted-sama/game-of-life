@@ -16,7 +16,7 @@
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    TTF_Font *font;      // Add font
+    TTF_Font *font;
     int running;
     int cell_size;
     int offset_x;

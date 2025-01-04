@@ -15,7 +15,7 @@ Board *create_board(int rows, int cols) {
     for (int i = 0; i < rows; i++) {
         board->cells[i] = malloc(cols * sizeof(Cell));
     }
-    // Create full board of dead cells
+    // On initialise toutes les cellules à mortes pour commencer
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             board->cells[i][j].state = DEAD;
@@ -48,7 +48,7 @@ void resize_board(Board *board, int rows, int cols) {
 }
 
 void destroy_board(Board *board) {
-   // Free history chain
+   // Pour chaque génération précédente, libérer la mémoire
    while (board->prev) {
        Board *prev = board->prev;
        for (int i = 0; i < prev->rows; i++) {
@@ -127,7 +127,7 @@ int print_board(Board *board) {
 }
 
 void generate_next_cells(Board *board) {
-    // Save current state
+    // Sauvegarder l'état actuel
     Board *prev = malloc(sizeof(Board));
     prev->rows = board->rows;
     prev->cols = board->cols;

@@ -113,11 +113,11 @@ void render_board(SDLContext *context, Board *board) {
         }
     }
 
-    // Render stats text
+    // Rendu des statistiques dans le coin supérieur gauche
     char stats[100];
-    snprintf(stats, sizeof(stats), "Gen: %d | Alive: %d | Dead: %d | %s",
+    snprintf(stats, sizeof(stats), "Gen: %d | Vivantes: %d | Mortes: %d | %s",
              board->generation, alive_cells, dead_cells,
-             context->paused ? "PAUSED" : "RUNNING");
+             context->paused ? "PAUSE" : "EN COURS");
 
     SDL_Color text_color = {255, 255, 255, 255};
     SDL_Surface *text_surface = TTF_RenderText_Blended(context->font, stats, text_color);
@@ -167,20 +167,20 @@ void handle_events(SDLContext *context, Board *board) {
                             save_current_state(board);
                         }
                         break;
-                    case SDLK_q:  // Undo when Ctrl+Z is pressed
+                    case SDLK_q:  // Précédente génération
                         if (context->paused && board->prev) {
                             Board *prev = board->prev;
                             
-                            // Copy previous state
+                            // Copie de l'état précédent
                             for (int i = 0; i < board->rows; i++) {
                                 memcpy(board->cells[i], prev->cells[i], board->cols * sizeof(Cell));
                             }
                             board->generation = prev->generation;
                             
-                            // Update prev pointer
+                            // Update du pointeur de génération précédente
                             board->prev = prev->prev;
                             
-                            // Clean up previous state
+                            // Libération de la mémoire
                             for (int i = 0; i < prev->rows; i++) {
                                 free(prev->cells[i]);
                             }
@@ -191,7 +191,7 @@ void handle_events(SDLContext *context, Board *board) {
                 }
                 break;
 
-            case SDL_MOUSEWHEEL:
+            case SDL_MOUSEWHEEL: // Zoom
                 if (event.wheel.y > 0) {
                     context->zoom *= 1.1f;
                     if (context->zoom > 5.0f) context->zoom = 5.0f;
@@ -206,22 +206,22 @@ void handle_events(SDLContext *context, Board *board) {
 }
 
 void save_current_state(Board *board) {
-    // Augmentez la taille des buffers
+    // Taille des buffers
     char filename[512];
     char full_filename[512];
 
-    // Récupérez l'heure actuelle
+    // Récupérer la date actuelle
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
 
-    // Générez le nom de base du fichier avec la date
+    // Génération le nom de base du fichier avec la date
     strftime(filename, sizeof(filename),
              "game_of_life_%Y%m%d_%H%M%S_gen", 
              tm_info);
 
-    // Ajoutez la génération et l'extension
+    // Nommage du fichier avec le numéro de génération actuel
     int result = snprintf(full_filename, sizeof(full_filename),
-                          "%s%d.txt", filename, board->generation);
+                          "exports/%s%d.txt", filename, board->generation);
 
     // Vérifiez si le nom a été tronqué
     if (result >= sizeof(full_filename)) {
@@ -229,9 +229,9 @@ void save_current_state(Board *board) {
         exit(EXIT_FAILURE);
     }
 
-    // Sauvegardez l'état dans le fichier
+    // Sauvegarde de l'état actuel en fichier txt
     export_board(board, full_filename);
 
-    // Affichez un message de confirmation
+    // Message de confirmation
     printf("\nÉtat sauvegardé dans : %s\n", full_filename);
 }

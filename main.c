@@ -37,7 +37,7 @@ char *get_filename() {
         exit(EXIT_FAILURE);
     }
 
-    // Allouez de la mémoire pour le chemin complet
+    // Alloue de la mémoire pour le chemin complet
     char *glider = malloc(512);
     if (!glider) {
         fprintf(stderr, "Erreur : Échec de l'allocation mémoire pour glider.\n");
@@ -45,10 +45,10 @@ char *get_filename() {
         exit(EXIT_FAILURE);
     }
 
-    // Construisez le chemin complet
+    // Nomme le chemin complet
     snprintf(glider, 512, "gliders/%s.txt", filename);
 
-    free(filename); // Libérez `filename` car il n'est plus utilisé
+    free(filename); // Libère la mémoire du nom du planeur
     return glider;
 }
 
@@ -92,7 +92,7 @@ int main() {
         fclose(test);
         import_board(board, glider);
     } else {
-        // Créer un planeur simple si les dimensions le permettent
+        // Si le fichier n'existe pas, on crée un planeur simple si les dimensions le permettent
         if (rows > 3 && cols > 3) {
             board->cells[1][2].state = ALIVE;
             board->cells[2][3].state = ALIVE;
