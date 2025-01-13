@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "gameoflife_sdl.h"
 
 SDLContext* init_sdl(int rows, int cols, int speed) {
@@ -15,22 +17,27 @@ SDLContext* init_sdl(int rows, int cols, int speed) {
         return NULL;
     }
 
-    context->font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16);
+    // Chemin de la police différent selon l'OS
+    #ifdef _WIN32
+        context->font = TTF_OpenFont("fonts/DejaVuSans.ttf", 16);  // La police doit être dans le même dossier que l'exe
+    #else
+        context->font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16);
+    #endif
+
     if (!context->font) {
         printf("Font loading failed: %s\n", TTF_GetError());
+        TTF_Quit();  // Ajout de TTF_Quit()
         SDL_Quit();
         free(context);
         return NULL;
     }
 
-    // Initialisation des valeurs par défaut
     context->cell_size = 10;
     context->offset_x = 0;
     context->offset_y = 0;
     context->paused = 0;
     context->zoom = 1.0f;
 
-    // Calcul de la taille optimale des cellules
     int cell_width = WINDOW_WIDTH / cols;
     int cell_height = WINDOW_HEIGHT / rows;
     context->cell_size = (cell_width < cell_height) ? cell_width : cell_height;
@@ -38,11 +45,15 @@ SDLContext* init_sdl(int rows, int cols, int speed) {
     if (context->cell_size < MIN_CELL_SIZE) context->cell_size = MIN_CELL_SIZE;
 
     context->window = SDL_CreateWindow("Game of Life",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_CENTERED,  // Changed from UNDEFINED to CENTERED
+        SDL_WINDOWPOS_CENTERED,  // Changed from UNDEFINED to CENTERED
         WINDOW_WIDTH, WINDOW_HEIGHT,
         SDL_WINDOW_SHOWN);
 
     if (!context->window) {
+        printf("Window creation failed: %s\n", SDL_GetError());  // Added error message
+        TTF_CloseFont(context->font);
+        TTF_Quit();
         SDL_Quit();
         free(context);
         return NULL;
@@ -52,7 +63,10 @@ SDLContext* init_sdl(int rows, int cols, int speed) {
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     if (!context->renderer) {
+        printf("Renderer creation failed: %s\n", SDL_GetError());  // Added error message
         SDL_DestroyWindow(context->window);
+        TTF_CloseFont(context->font);
+        TTF_Quit();
         SDL_Quit();
         free(context);
         return NULL;

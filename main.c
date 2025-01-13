@@ -61,7 +61,7 @@ int get_simulation_speed() {
     return speed;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     // Demande des dimensions à l'utilisateur
     printf("Bienvenue dans le Jeu de la Vie!\n");
     printf("Veuillez choisir les dimensions de la grille.\n");

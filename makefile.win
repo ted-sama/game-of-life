@@ -1,0 +1,21 @@
+# Compilateur MinGW pour Windows
+CC = x86_64-w64-mingw32-gcc
+
+# Options du compilateur
+CFLAGS = -Wall -std=c99 -I/home/ted/mingw32/SDL2-2.30.11/x86_64-w64-mingw32/include
+
+# Options de l'éditeur de liens
+LDFLAGS = -L/home/ted/mingw32/SDL2-2.30.11/x86_64-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lmsvcrt -static-libgcc -static-libstdc++
+
+# Cibles
+all: gameoflife.exe
+
+gameoflife.exe: main.o gameoflife.o gameoflife_sdl.o
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Nettoyage des fichiers objets et de l'exécutable
+clean:
+	rm -f *.o gameoflife.exe
