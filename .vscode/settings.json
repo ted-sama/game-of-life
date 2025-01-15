@@ -1,10 +1,15 @@
 {
     "files.associations": {
+        "*.sqlbook": "sql",
+        "*.ndjson": "jsonl",
+        "*.dbclient-js": "javascript",
         "*.embeddedhtml": "html",
         "*.page-template": "vue",
         "*.layout-template": "vue",
         "*.vue": "vue",
         "*.twig": "twig",
-        "game_of_life.h": "c"
+        "game_of_life.h": "c",
+        "gameoflife_sdl.h": "c",
+        "utilities.h": "c"
     }
 }

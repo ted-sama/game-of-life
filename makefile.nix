@@ -3,7 +3,7 @@ LDFLAGS = -lSDL2 -lSDL2_ttf
 
 all: gameoflife
 
-gameoflife: main.o gameoflife.o gameoflife_sdl.o
+gameoflife: main.o gameoflife.o gameoflife_sdl.o utilities.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 %.o: %.c

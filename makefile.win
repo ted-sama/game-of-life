@@ -10,7 +10,7 @@ LDFLAGS = -L/home/ted/mingw32/SDL2-2.30.11/x86_64-w64-mingw32/lib -lmingw32 -lSD
 # Cibles
 all: gameoflife.exe
 
-gameoflife.exe: main.o gameoflife.o gameoflife_sdl.o
+gameoflife.exe: main.o gameoflife.o gameoflife_sdl.o utilities.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 %.o: %.c
