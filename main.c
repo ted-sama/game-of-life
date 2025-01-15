@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "gameoflife_sdl.h"
 
+// Fonction pour obtenir une entrée valide de l'utilisateur quand il initiatilise le jeu
 int get_valid_input(int min, int max, const char *prompt) {
     int value;
     int valid = 0;
@@ -23,6 +24,7 @@ int get_valid_input(int min, int max, const char *prompt) {
     return value;
 }
 
+// Fonction pour obtenir le nom du fichier à charger depuis le dossier 'gliders
 char *get_filename() {
     char *filename = malloc(512);
     if (!filename) {
@@ -52,6 +54,7 @@ char *get_filename() {
     return glider;
 }
 
+// Fonction pour obtenir la vitesse de simulation de l'utilisateur
 int get_simulation_speed() {
     int speed;
     printf("Entrez la vitesse de simulation (en ms entre chaque génération, 100-2000): ");
@@ -102,6 +105,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Affichage des commandes dans le terminal pour l'utilisateur
     printf("\nCommandes:\n");
     printf("- ESPACE : Pause/Reprise\n");
     printf("- Flèches : Déplacement de la vue\n");

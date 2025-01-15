@@ -1,6 +1,13 @@
 #ifndef GAMEOFLIFE_H
 #define GAMEOFLIFE_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #define ALIVE_CHAR '\u25A0'
 #define DEAD_CHAR '\u25A1'
 

@@ -3,6 +3,9 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "gameoflife.h"
 
 #define MAX_ROWS 90
@@ -13,6 +16,7 @@
 #define WINDOW_HEIGHT 1080
 #define PAN_SPEED 30
 
+// Structure de contexte SDL (fenêtre, rendu, police, etc.)
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;

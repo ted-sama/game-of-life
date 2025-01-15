@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "gameoflife.h"
 
 Board *create_board(int rows, int cols) {
@@ -103,6 +97,7 @@ void export_board(Board *board, char *filename) {
     fclose(file);
 }
 
+// Affiche le plateau de jeu pour la version terminal
 int print_board(Board *board) {
     int alive_cells = 0;
     for (int i = 0; i < board->rows; i++) {
