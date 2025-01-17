@@ -4,28 +4,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define ALIVE_CHAR '\u25A0'
 #define DEAD_CHAR '\u25A1'
 
-typedef enum {
-    ALIVE,
-    DEAD
-} State;
+typedef enum { ALIVE, DEAD } State;
 
 typedef struct {
-    State state;
+  State state;
 } Cell;
 
-typedef struct Board{
-    int rows;
-    int cols;
-    Cell **cells;
-    int generation;
-    struct Board *prev;  // Pointeur vers la génération précédente pour le undo
+typedef struct Board {
+  int rows;
+  int cols;
+  Cell **cells;
+  int generation;
+  struct Board *prev; // Pointeur vers la génération précédente pour le undo
+  struct Board *next; // Pointeur vers la génération suivante pour le redo
 } Board;
 
 Board *create_board(int rows, int cols);
