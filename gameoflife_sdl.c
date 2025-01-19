@@ -138,32 +138,51 @@ void render_help(SDLContext *context) {
   }
 }
 
+void set_save_message(SDLContext *context, const char *message) {
+  if (context) {
+    strncpy(context->save_message.text, message,
+            sizeof(context->save_message.text) - 1);
+    context->save_message.text[sizeof(context->save_message.text) - 1] = '\0';
+    context->save_message.display_time = 3000;
+    context->save_message.start_time = SDL_GetTicks();
+  }
+}
+
 void render_save_message(SDLContext *context) {
-  if (context->save_message.display_time > 0) {
+  if (context && context->save_message.display_time > 0) {
     Uint32 current_time = SDL_GetTicks();
     Uint32 elapsed = current_time - context->save_message.start_time;
 
     if (elapsed < context->save_message.display_time) {
       // Calcul de l'alpha pour le fade out
       float fade = 1.0f - ((float)elapsed / context->save_message.display_time);
-      SDL_Color msg_color = {0, 255, 0, 255}; // Vert sans fade pour commencer
+      SDL_Color msg_color = {0, 255, 0, 255}; // Couleur verte
 
       int w, h;
+      // AVerifier si le contexte est valide pour afficher le message
+      if (!context->renderer) {
+        return;
+      }
+
       SDL_Texture *text =
           render_text(context, context->save_message.text, msg_color, &w, &h);
       if (text) {
-        // Modifier la transparence au niveau du rendu plutôt que de la couleur
         SDL_SetTextureAlphaMod(text, (Uint8)(fade * 255));
 
-        // Positionner le message en bas de l'écran
-        SDL_Rect dest = {(WINDOW_WIDTH - w) / 2, // Centré horizontalement
-                         WINDOW_HEIGHT - 100,    // 100 pixels du bas
-                         w, h};
+        SDL_Rect dest = {(WINDOW_WIDTH - w) / 2, WINDOW_HEIGHT - 100, w, h};
+
+        // Settings de blend pour le rendu du texte
+        SDL_BlendMode previousBlendMode;
+        SDL_GetRenderDrawBlendMode(context->renderer, &previousBlendMode);
+
+        SDL_SetRenderDrawBlendMode(context->renderer, SDL_BLENDMODE_BLEND);
         SDL_RenderCopy(context->renderer, text, NULL, &dest);
+
+        SDL_SetRenderDrawBlendMode(context->renderer, previousBlendMode);
+
         SDL_DestroyTexture(text);
       }
     } else {
-      // Réinitialiser le message une fois le temps écoulé
       context->save_message.display_time = 0;
       context->save_message.text[0] = '\0';
     }
@@ -219,10 +238,10 @@ void render_board(SDLContext *context, Board *board) {
     SDL_DestroyTexture(stats_texture);
   }
 
-  // Rendu de l'aide (commands)
+  // Affichage des commandes
   render_help(context);
 
-  // Rendu du message de sauvegarde si nécessaire
+  // Affichage du message de sauvegarde
   render_save_message(context);
 
   SDL_RenderPresent(context->renderer);
@@ -290,7 +309,7 @@ void handle_events(SDLContext *context, Board *board) {
         break;
       case SDLK_s: // Sauvegarder
         if (context->paused) {
-          save_current_state(board);
+          save_current_state(context, board);
         }
         break;
       case SDLK_q: // Précédente génération
@@ -335,11 +354,9 @@ void handle_events(SDLContext *context, Board *board) {
   }
 }
 
-void save_current_state(Board *board) {
-  char filename[512];
+void save_current_state(SDLContext *context, Board *board) {
+  char filename[256];
   char full_filename[512];
-  char display_filename[200]; // Buffer plus petit pour le nom affiché car trop
-                              // long sinon
 
   time_t t = time(NULL);
   struct tm *tm_info = localtime(&t);
@@ -347,40 +364,32 @@ void save_current_state(Board *board) {
   strftime(filename, sizeof(filename), "game_of_life_%Y%m%d_%H%M%S_gen",
            tm_info);
 
-  int result = snprintf(full_filename, sizeof(full_filename),
-                        "exports/%s%d.txt", filename, board->generation);
-
-  if (result >= sizeof(full_filename)) {
-    fprintf(stderr, "Erreur : le nom de fichier a été tronqué.\n");
+  if (snprintf(full_filename, sizeof(full_filename), "exports/%s_%d.txt",
+               filename, board->generation) >= sizeof(full_filename)) {
+    fprintf(stderr, "Erreur : nom de fichier trop long\n");
     return;
   }
 
+  // Créer le dossier exports s'il n'existe pas (Windows/Linux)
+  create_directory("exports");
+
   export_board(board, full_filename);
 
-  // Extraire seulement le nom du fichier sans le chemin complet
+  // Extraire le nom du fichier sans le chemin pour raccourcir le message
   const char *base_name = strrchr(full_filename, '/');
-  if (base_name != NULL) {
-    base_name++; // Sauter le '/'
-  } else {
-    base_name = full_filename;
-  }
+  base_name = base_name ? base_name + 1 : full_filename;
 
-  // Copier au maximum les 50 premiers caractères du nom de fichier pour éviter
-  // un dépassement du buffer
-  strncpy(display_filename, base_name, 199);
-  display_filename[199] = '\0';
+  // Définir directement le message puisque nous avons le contexte
+  char message[256];
+  snprintf(message, sizeof(message), "Sauvegardé : %s", base_name);
 
-  // Récupérer le contexte SDL depuis la fenêtre active
-  SDL_Window *window = SDL_GetWindowFromID(1);
-  if (window) {
-    SDLContext *context =
-        (SDLContext *)SDL_GetWindowData(window, "sdl_context");
-    if (context) {
-      snprintf(context->save_message.text, sizeof(context->save_message.text),
-               "Sauvegardé : %s", display_filename);
-      context->save_message.display_time = 3000;
-      context->save_message.start_time = SDL_GetTicks();
-    }
+  // On s'assure que le contexte existe avant de définir le message
+  if (context) {
+    strncpy(context->save_message.text, message,
+            sizeof(context->save_message.text) - 1);
+    context->save_message.text[sizeof(context->save_message.text) - 1] = '\0';
+    context->save_message.display_time = 3000;
+    context->save_message.start_time = SDL_GetTicks();
   }
 
   printf("\nÉtat sauvegardé dans : %s\n", full_filename);

@@ -7,5 +7,6 @@
 int get_valid_input(int min, int max, const char *prompt);
 char *get_filename();
 int get_simulation_speed();
+int create_directory(const char *path);
 
 #endif

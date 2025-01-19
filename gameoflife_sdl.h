@@ -2,6 +2,7 @@
 #define GAMEOFLIFE_SDL_H
 
 #include "gameoflife.h"
+#include "utilities.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
@@ -43,9 +44,10 @@ void cleanup_sdl(SDLContext *context);
 SDL_Texture *render_text(SDLContext *context, const char *text, SDL_Color color,
                          int *w, int *h);
 void render_help(SDLContext *context);
+void set_save_message(SDLContext *context, const char *message);
 void render_save_message(SDLContext *context);
 void render_board(SDLContext *context, Board *board);
 void handle_events(SDLContext *context, Board *board);
-void save_current_state(Board *board);
+void save_current_state(SDLContext *context, Board *board);
 
 #endif

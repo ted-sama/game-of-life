@@ -66,3 +66,11 @@ int get_simulation_speed() {
     speed = 2000;
   return speed;
 }
+
+int create_directory(const char *path) {
+#ifdef _WIN32
+  return system("mkdir exports");
+#else
+  return system("mkdir -p exports");
+#endif
+}
